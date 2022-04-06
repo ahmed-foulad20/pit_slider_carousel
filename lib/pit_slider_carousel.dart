@@ -17,20 +17,20 @@ class Position {
 
 class CarouselItem {
   Widget widget;
-  Widget button;
+  Widget? button;
 
   CarouselItem(this.widget, {this.button});
 }
 
 class PitSliderCarousel extends StatefulWidget {
   final CarouselController carouselController;
-  final List<Widget> children;
+  final List<Widget>? children;
 
   final double height;
   final EdgeInsetsGeometry margin;
 
   ///Returns [children]`s [lenght].
-  int get childrenCount => children.length;
+  int get childrenCount => children!.length;
 
   ///The transition animation timing curve. Default is [Curves.ease]
   final Curve animationCurve;
@@ -50,18 +50,18 @@ class PitSliderCarousel extends StatefulWidget {
   final Position dotPosition;
   final Position buttonPosition;
   final Widget placeholder;
-  final Function(double index) callback;
+  final Function(double index)? callback;
   final int maxDotsIndicator;
   final double dotSize;
   final Color activeDotColor;
   final Color dotColor;
-  final Key key;
+  final Key? key;
 
   PitSliderCarousel(
-      {Key key,
-        double height,
-        EdgeInsetsGeometry margin,
-        CarouselController carouselController,
+      {Key? key,
+        double? height,
+        EdgeInsetsGeometry? margin,
+        CarouselController? carouselController,
         this.children,
         this.animationCurve = Curves.bounceOut,
         this.animationDuration = const Duration(milliseconds: 2000),
@@ -71,14 +71,14 @@ class PitSliderCarousel extends StatefulWidget {
         bool useDot = true,
         this.dotAlignment = Alignment.bottomCenter,
         this.dotPosition = const Position(),
-        Widget placeholder,
+        Widget? placeholder,
         this.buttonAlignment = Alignment.bottomCenter,
         this.buttonPosition = const Position(),
         this.callback,
-        int maxDotsIndicator,
-        double dotSize,
-        Color dotColor,
-        Color activeDotColor})
+        int? maxDotsIndicator,
+        double? dotSize,
+        Color? dotColor,
+        Color? activeDotColor})
       : assert(height == null || height > 0),
         assert(children == null || carouselController == null),
         assert(animationCurve != null),
@@ -86,7 +86,7 @@ class PitSliderCarousel extends StatefulWidget {
         assert(displayDuration != null),
         this.carouselController = carouselController ??
             new CarouselController(
-                carouselItems: children.map((widget) => CarouselItem(widget)).toList() /*widgets: children*/),
+                carouselItems: children!.map((widget) => CarouselItem(widget)).toList() /*widgets: children*/),
         this.height = height ?? 210.0,
         this.margin = margin ?? new EdgeInsets.all(0.0),
         this.useDot = useDot ?? true,
@@ -107,7 +107,7 @@ class _PitSliderCarouselState extends State<PitSliderCarousel> with SingleTicker
   PageController _pageController = new PageController();
   ScrollController _scrollController = new ScrollController();
 
-  Timer _timer;
+  Timer? _timer;
 
   double dotIncreaseSize = 1.4;
   int position = 0;
@@ -118,14 +118,14 @@ class _PitSliderCarouselState extends State<PitSliderCarousel> with SingleTicker
   double get dotSpacing => widget.dotSize * (dotIncreaseSize + 1);
 
   ///Actual index of the displaying Widget
-  int get actualIndex => !_pageController.hasClients ? 0 : _pageController.page.round();
+  int get actualIndex => !_pageController.hasClients ? 0 : _pageController.page!.round();
 
   ///Returns the calculated value of the next index.
   int get nextIndex {
     var nextIndexValue = actualIndex;
 
     if (widget.carouselController.carouselItems != null &&
-        nextIndexValue < widget.carouselController.carouselItems.length - 1)
+        nextIndexValue < widget.carouselController.carouselItems!.length - 1)
       nextIndexValue++;
     else
       nextIndexValue = 0;
@@ -160,7 +160,7 @@ class _PitSliderCarouselState extends State<PitSliderCarousel> with SingleTicker
 
   @override
   Widget build(BuildContext context) {
-    if (widget.carouselController.carouselItems == null || widget.carouselController.carouselItems.isEmpty)
+    if (widget.carouselController.carouselItems == null || widget.carouselController.carouselItems!.isEmpty)
       return createCarouselPlaceHolder();
 
     if (widget.autoPlay) startAnimating();
@@ -168,7 +168,7 @@ class _PitSliderCarouselState extends State<PitSliderCarousel> with SingleTicker
     _pageController.addListener(() => setState(() {
       currentPage = !_pageController.hasClients ? 0.0 : _pageController.page ?? 0.0;
       if (widget.callback != null) {
-        widget.callback((currentPage + 1));
+        widget.callback!((currentPage + 1));
       }
     }));
 
@@ -179,23 +179,23 @@ class _PitSliderCarouselState extends State<PitSliderCarousel> with SingleTicker
           new PageView(
               controller: this._pageController,
               physics: new AlwaysScrollableScrollPhysics(),
-              children: widget.carouselController.carouselItems
+              children: widget.carouselController.carouselItems!
                   .map((carouselItem) => new Container(
                 child: carouselItem.widget,
               ))
                   .toList(),
               onPageChanged: (current) {
-                if (widget.useDot && widget.carouselController.carouselItems.length > widget.maxDotsIndicator) {
+                if (widget.useDot && widget.carouselController.carouselItems!.length > widget.maxDotsIndicator) {
                   if (current == 0) {
                     isStart = true;
                   }
                   if (current >= (widget.maxDotsIndicator - 1)) {
                     isStart = false;
                   }
-                  if (current <= widget.carouselController.carouselItems.length - widget.maxDotsIndicator) {
+                  if (current <= widget.carouselController.carouselItems!.length - widget.maxDotsIndicator) {
                     isEnd = false;
                   }
-                  if (current == widget.carouselController.carouselItems.length - 1) {
+                  if (current == widget.carouselController.carouselItems!.length - 1) {
                     isEnd = true;
                   }
 
@@ -219,7 +219,7 @@ class _PitSliderCarouselState extends State<PitSliderCarousel> with SingleTicker
               child: Container(
                 alignment: widget.dotAlignment,
                 child: widget.useDot
-                    ? widget.carouselController.carouselItems.length > widget.maxDotsIndicator
+                    ? widget.carouselController.carouselItems!.length > widget.maxDotsIndicator
                     ?  new Container(
                   width: (dotSpacing * widget.maxDotsIndicator),
                   child: SingleChildScrollView(
@@ -229,19 +229,19 @@ class _PitSliderCarouselState extends State<PitSliderCarousel> with SingleTicker
                       mainAxisSize: MainAxisSize.min,
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: new List<Widget>.generate(
-                          widget.carouselController.carouselItems.length, _buildDotScrollable),
+                          widget.carouselController.carouselItems!.length, _buildDotScrollable),
                     ),
                   ),
                 )
-                    : widget.carouselController.carouselItems.length == 1 ? Container(): Row(
+                    : widget.carouselController.carouselItems!.length == 1 ? Container(): Row(
                   mainAxisSize: MainAxisSize.min,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children:
-                  new List<Widget>.generate(widget.carouselController.carouselItems.length, _buildDot),
+                  new List<Widget>.generate(widget.carouselController.carouselItems!.length, _buildDot),
                 )
                     : _buildPageNumber(),
               )),
-          widget.carouselController.carouselItems.length != 0 ? _buildButton() : Container()
+          widget.carouselController.carouselItems!.length != 0 ? _buildButton() : Container()
         ]));
   }
 
@@ -258,7 +258,7 @@ class _PitSliderCarouselState extends State<PitSliderCarousel> with SingleTicker
           child: AbsorbPointer(
             absorbing: (opacity < 0.5 ? 1 - opacity * 2 : (opacity - 0.5) * 2) < 0.999999,
             child: Opacity(
-              child: widget.carouselController.carouselItems.length == 1?widget.carouselController.carouselItems[0].button: widget.carouselController.carouselItems[currentPage.round()].button,
+              child: widget.carouselController.carouselItems!.length == 1?widget.carouselController.carouselItems![0].button: widget.carouselController.carouselItems![currentPage.round()].button,
               opacity: opacity < 0.5 ? 1 - opacity * 2 : (opacity - 0.5) * 2,
             ),
           ),
@@ -279,7 +279,7 @@ class _PitSliderCarouselState extends State<PitSliderCarousel> with SingleTicker
                 text: '${(currentPage + 1).round()}',
                 style:
                 TextStyle(color: Colors.black.withOpacity(opacity < 0.5 ? 1 - opacity * 2 : (opacity - 0.5) * 2))),
-            TextSpan(text: ' / ${widget.carouselController.carouselItems.length}')
+            TextSpan(text: ' / ${widget.carouselController.carouselItems!.length}')
           ]))
         ],
       ),
@@ -315,8 +315,8 @@ class _PitSliderCarouselState extends State<PitSliderCarousel> with SingleTicker
       dotleft = (widget.maxDotsIndicator - 1);
       dotRight = (widget.maxDotsIndicator - 1);
     } else if (isEnd && !isStart) {
-      dotRight = widget.carouselController.carouselItems.length - widget.maxDotsIndicator;
-      dotleft = widget.carouselController.carouselItems.length - widget.maxDotsIndicator;
+      dotRight = widget.carouselController.carouselItems!.length - widget.maxDotsIndicator;
+      dotleft = widget.carouselController.carouselItems!.length - widget.maxDotsIndicator;
     } else {
       if (position == 1) {
         dotRight = currentPage.round() + (widget.maxDotsIndicator - 2);
@@ -407,9 +407,9 @@ class _PitSliderCarouselState extends State<PitSliderCarousel> with SingleTicker
       widget.displayDuration,
           (_) {
         if (!widget.repeat) {
-          if (this.nextIndex == 0) _timer.cancel();
+          if (this.nextIndex == 0) _timer!.cancel();
 
-          if (!_timer.isActive) return;
+          if (!_timer!.isActive) return;
         }
 
         this
@@ -425,13 +425,13 @@ class _PitSliderCarouselState extends State<PitSliderCarousel> with SingleTicker
 }
 
 class CarouselController extends ValueNotifier<CarouselEditingValue> {
-  List<CarouselItem> get carouselItems => value.carouselItems;
+  List<CarouselItem>? get carouselItems => value.carouselItems;
 
   set widgets(List<Widget> newWidgets) {
     value = value.copyWith(widgets: newWidgets);
   }
 
-  CarouselController({List<CarouselItem> carouselItems})
+  CarouselController({List<CarouselItem>? carouselItems})
       : super(carouselItems == null
       ? CarouselEditingValue.empty
       : new CarouselEditingValue(carouselItems: carouselItems));
@@ -447,12 +447,12 @@ class CarouselController extends ValueNotifier<CarouselEditingValue> {
 class CarouselEditingValue {
   const CarouselEditingValue({this.carouselItems});
 
-  final List<CarouselItem> carouselItems;
+  final List<CarouselItem>? carouselItems;
 
   static const CarouselEditingValue empty = const CarouselEditingValue();
 
-  CarouselEditingValue copyWith({List<Widget> widgets}) {
-    return new CarouselEditingValue(carouselItems: widgets ?? this.carouselItems);
+  CarouselEditingValue copyWith({List<Widget>? widgets}) {
+    return new CarouselEditingValue(carouselItems: widgets as List<CarouselItem>? ?? this.carouselItems);
   }
 
   CarouselEditingValue.fromValue(CarouselEditingValue copy) : this.carouselItems = copy.carouselItems;
