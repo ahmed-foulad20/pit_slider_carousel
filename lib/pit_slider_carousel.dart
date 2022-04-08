@@ -43,7 +43,7 @@ class PitSliderCarousel extends StatefulWidget {
 
   final bool autoPlay;
   final bool repeat;
-  final bool useDot;
+  final bool? useDot;
 
   final Alignment dotAlignment;
   final Alignment buttonAlignment;
@@ -81,17 +81,14 @@ class PitSliderCarousel extends StatefulWidget {
         Color? activeDotColor})
       : assert(height == null || height > 0),
         assert(children == null || carouselController == null),
-        assert(animationCurve != null),
-        assert(animationDuration != null),
-        assert(displayDuration != null),
         this.carouselController = carouselController ??
             new CarouselController(
                 carouselItems: children!.map((widget) => CarouselItem(widget)).toList() /*widgets: children*/),
         this.height = height ?? 210.0,
         this.margin = margin ?? new EdgeInsets.all(0.0),
-        this.useDot = useDot ?? true,
-        this.autoPlay = autoPlay ?? true,
-        this.repeat = repeat ?? true,
+        useDot = useDot,
+        this.autoPlay = autoPlay,
+        this.repeat = repeat ,
         this.maxDotsIndicator = maxDotsIndicator ?? 3,
         this.dotSize = dotSize ?? 8.0,
         this.key = key,
@@ -175,7 +172,7 @@ class _PitSliderCarouselState extends State<PitSliderCarousel> with SingleTicker
     return new Container(
         height: widget.height,
         margin: widget.margin,
-        child: new Stack(overflow: Overflow.visible, children: [
+        child: new Stack(clipBehavior: Clip.none, children: [
           new PageView(
               controller: this._pageController,
               physics: new AlwaysScrollableScrollPhysics(),
@@ -185,7 +182,7 @@ class _PitSliderCarouselState extends State<PitSliderCarousel> with SingleTicker
               ))
                   .toList(),
               onPageChanged: (current) {
-                if (widget.useDot && widget.carouselController.carouselItems!.length > widget.maxDotsIndicator) {
+                if (widget.useDot! && widget.carouselController.carouselItems!.length > widget.maxDotsIndicator) {
                   if (current == 0) {
                     isStart = true;
                   }
@@ -218,7 +215,7 @@ class _PitSliderCarouselState extends State<PitSliderCarousel> with SingleTicker
               right: widget.dotPosition.right,
               child: Container(
                 alignment: widget.dotAlignment,
-                child: widget.useDot
+                child: widget.useDot!
                     ? widget.carouselController.carouselItems!.length > widget.maxDotsIndicator
                     ?  new Container(
                   width: (dotSpacing * widget.maxDotsIndicator),
@@ -436,7 +433,7 @@ class CarouselController extends ValueNotifier<CarouselEditingValue> {
       ? CarouselEditingValue.empty
       : new CarouselEditingValue(carouselItems: carouselItems));
 
-  CarouselController.fromValue(CarouselEditingValue value) : super(value ?? CarouselEditingValue.empty);
+  CarouselController.fromValue(CarouselEditingValue value) : super(value);
 
   void clear() {
     value = CarouselEditingValue.empty;
